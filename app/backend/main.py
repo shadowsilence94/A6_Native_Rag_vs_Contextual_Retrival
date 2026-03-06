@@ -1,4 +1,6 @@
 import os
+import json
+import random
 from fastapi import FastAPI, HTTPException, Request, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -24,6 +26,7 @@ class ChatRequest(BaseModel):
 
 # Paths
 VECTORSTORE_DIR = "../answer/contextual_faiss_index"
+DATASET_PATH = "../answer/response-st-126010-chapter-10.json"
 
 # Global state for embeddings/retriever
 _embeddings = None
@@ -46,6 +49,31 @@ def get_retriever():
         
     return _vectorstore.as_retriever(search_kwargs={"k": 3})
 
+@app.get("/api/suggestions")
+async def get_suggestions():
+    try:
+        with open(DATASET_PATH, "r") as f:
+            data = json.load(f)
+            
+        # Extract all questions
+        questions = [item["question"] for item in data if "question" in item]
+        
+        # Select 3 random questions
+        if len(questions) >= 3:
+            suggestions = random.sample(questions, 3)
+        else:
+            suggestions = questions
+            
+        return {"suggestions": suggestions}
+    except Exception as e:
+        print(f"Error loading suggestions: {e}")
+        # Fallback prompts if file is missing
+        return {"suggestions": [
+            "What is a Transformer?",
+            "How does attention work?",
+            "What are pretrained language models?"
+        ]}
+
 @app.post("/api/chat")
 async def chat_endpoint(req: ChatRequest, x_api_key: Optional[str] = Header(None)):
     if not x_api_key:
@@ -59,9 +87,9 @@ async def chat_endpoint(req: ChatRequest, x_api_key: Optional[str] = Header(None
         raise HTTPException(status_code=500, detail=f"Failed to load retriever: {str(e)}")
         
     try:
-        # Initialize LLM with the provided key
+        # Initialize LLM with the provided key using Gemini 2.5 Flash
         llm = ChatGoogleGenerativeAI(
-            model="gemini-3.0-flash", 
+            model="gemini-2.5-flash", 
             temperature=0, 
             google_api_key=x_api_key
         )

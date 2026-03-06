@@ -7,6 +7,7 @@ const closeSourceBtn = document.getElementById('close-source-btn');
 const chatWindow = document.getElementById('chat-window');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
+const suggestionsContainer = document.getElementById('suggestions-container');
 
 let apiKey = localStorage.getItem('gemini_api_key');
 
@@ -15,6 +16,7 @@ if (!apiKey) {
     apiModal.classList.remove('hidden');
 } else {
     apiModal.classList.add('hidden');
+    loadSuggestions(); // Fetch suggestions if key already exists
 }
 
 saveKeyBtn.addEventListener('click', () => {
@@ -23,11 +25,82 @@ saveKeyBtn.addEventListener('click', () => {
         apiKey = key;
         localStorage.setItem('gemini_api_key', key);
         apiModal.classList.add('hidden');
+        loadSuggestions(); // Fetch suggestions on new key enter
     }
 });
 
 closeSourceBtn.addEventListener('click', () => {
     sourceModal.classList.add('hidden');
+});
+
+// Fetch dynamic suggestions from backend
+async function loadSuggestions() {
+    try {
+        const response = await fetch('/api/suggestions');
+        if (response.ok) {
+            const data = await response.json();
+            renderSuggestions(data.suggestions);
+        }
+    } catch (err) {
+        console.error("Failed to load suggestions:", err);
+    }
+}
+
+function renderSuggestions(suggestions) {
+    suggestionsContainer.innerHTML = ''; // Clear out old ones
+    if (suggestions && suggestions.length > 0) {
+        suggestions.forEach(text => {
+            const chip = document.createElement('div');
+            chip.className = 'suggestion-chip';
+            chip.textContent = text;
+            chip.draggable = true;
+            
+            // Drag and Drop Logic for Chips
+            chip.addEventListener('dragstart', (e) => {
+                chip.classList.add('dragging');
+                e.dataTransfer.setData('text/plain', text);
+            });
+            
+            chip.addEventListener('dragend', () => {
+                chip.classList.remove('dragging');
+            });
+            
+            // Allow clicking to auto-fill as an alternative to dragging
+            chip.addEventListener('click', () => {
+               userInput.value = text;
+               userInput.style.height = 'auto';
+               userInput.style.height = (userInput.scrollHeight) + 'px';
+               userInput.focus();
+            });
+
+            suggestionsContainer.appendChild(chip);
+        });
+        suggestionsContainer.classList.remove('hidden');
+    }
+}
+
+// Drag and Drop Logic for Textarea
+userInput.addEventListener('dragover', (e) => {
+    e.preventDefault(); // Necessary to allow dropping
+    userInput.classList.add('drag-over');
+});
+
+userInput.addEventListener('dragleave', () => {
+    userInput.classList.remove('drag-over');
+});
+
+userInput.addEventListener('drop', (e) => {
+    e.preventDefault();
+    userInput.classList.remove('drag-over');
+    
+    // Attempt to get text from the dragged item
+    const droppedText = e.dataTransfer.getData('text/plain');
+    if (droppedText) {
+        userInput.value = droppedText;
+        // Auto-expand the textarea so the user can read the dropped text
+        userInput.style.height = 'auto';
+        userInput.style.height = (userInput.scrollHeight) + 'px';
+    }
 });
 
 // Auto-expand textarea
@@ -53,6 +126,9 @@ async function sendMessage() {
     // Reset input
     userInput.value = '';
     userInput.style.height = 'auto';
+
+    // Hide suggestions once a conversation starts
+    suggestionsContainer.classList.add('hidden');
 
     // Add user message
     addMessage(text, 'user');
