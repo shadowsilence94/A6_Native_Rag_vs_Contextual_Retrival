@@ -1,0 +1,12 @@
+pymupdf
+langchain-text-splitters
+python-dotenv
+openai
+langchain
+langchain-community
+langchain-openai
+faiss-cpu
+fastapi
+uvicorn
+jinja2
+pydantic

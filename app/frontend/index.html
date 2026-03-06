@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 10 AI Assistant</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- API Key Modal Overlay -->
+    <div id="api-modal" class="modal-overlay">
+        <div class="modal">
+            <h2>Welcome to Chapter 10 AI</h2>
+            <p>Please enter your Gemini API Key to proceed. This key is used temporarily for this session.</p>
+            <input type="password" id="api-key-input" placeholder="Your API Key (gemini-3.0-flash)" autocomplete="off">
+            <button id="save-key-btn">Start Session</button>
+        </div>
+    </div>
+
+    <!-- Main Chat UI -->
+    <div class="app-container">
+        <header>
+            <h1>Chapter 10 Assistant</h1>
+            <p class="subtitle">Contextual Retrieval Augmented Generation</p>
+        </header>
+
+        <div class="chat-window" id="chat-window">
+            <div class="message system-msg">
+                <div class="msg-content">Hello. I am the AI assistant for Chapter 10 (Transformers and Pretrained Language Models). Ask me any question related to the chapter.</div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <textarea id="user-input" placeholder="Ask a question..." rows="1"></textarea>
+            <button id="send-btn">Send</button>
+        </div>
+    </div>
+
+    <!-- Source Chunk Modal -->
+    <div id="source-modal" class="modal-overlay hidden">
+        <div class="modal source-modal">
+            <h3>Source Context</h3>
+            <p id="source-text"></p>
+            <button id="close-source-btn">Close</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
