@@ -1,5 +1,13 @@
-# A6: Naive RAG vs Contextual Retrieval
+---
+title: A6 Contextual RAG
+emoji: 📚
+colorFrom: green
+colorTo: blue
+sdk: docker
+pinned: false
+---
 
+# A6: Naive RAG vs Contextual Retrieval
 This repository contains the implementation for Assignment 6: Naive RAG vs Contextual Retrieval.
 The assignment is based on Chapter 10 ("Transformers and Pretrained Language Models") of the NLP textbook by Jurafsky & Martin.
 
