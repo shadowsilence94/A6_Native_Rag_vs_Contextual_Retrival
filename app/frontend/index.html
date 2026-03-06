@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapter 10 AI Assistant</title>
+    <title>Chapter AI Assistant</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
@@ -12,40 +12,62 @@
     <!-- API Key Modal Overlay -->
     <div id="api-modal" class="modal-overlay">
         <div class="modal">
-            <h2>Welcome to Chapter 10 AI</h2>
+            <h2>Welcome to the Chapter AI</h2>
             <p>Please enter your Gemini API Key to proceed. This key is used temporarily for this session.</p>
             <input type="password" id="api-key-input" placeholder="Your API Key (gemini-2.5-flash)" autocomplete="off">
             <button id="save-key-btn">Start Session</button>
         </div>
     </div>
 
-    <!-- Main Chat UI -->
-    <div class="app-container">
-        <header>
-            <h1>Chapter 10 Assistant</h1>
-            <p class="subtitle">Contextual Retrieval Augmented Generation</p>
+    <!-- Main App Layout -->
+    <div class="main-layout">
+        
+        <!-- Left Sidebar: Suggestions & Controls -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>Controls</h2>
+            </div>
             
-            <div class="project-info">
-                <strong>Project:</strong> Comparing Contextual Retrieval vs Naive RAG.<br>
-                <strong>Topic:</strong> Chapter 10: Transformers and Pretrained Language Models.<br>
-                <strong>Dataset:</strong> Text extracted directly from Jurafsky & Martin NLP textbook and 20 generated Question-Answer pairs.<br>
-                <strong>Instructions:</strong> Retrieve context by asking any question below or dragging a suggested prompt!
+            <div class="control-group">
+                <label for="chapter-select">Select Chapter:</label>
+                <select id="chapter-select" class="glass-select">
+                    <!-- Dynamic options loaded from backend -->
+                </select>
             </div>
-        </header>
 
-        <div class="chat-window" id="chat-window">
-            <div class="message system-msg">
-                <div class="msg-content">Hello. I am the AI assistant for Chapter 10. Ask me any question related to Transformers or Language Models. I will stream the answer directly using the Contextual RAG Vectorstore!</div>
+            <div class="suggestions-section">
+                <h3>Suggested Prompts</h3>
+                <p class="sidebar-sub">Drag and drop into the chat, or click them to fill the box.</p>
+                <div id="suggestions-container" class="suggestions-container hidden">
+                    <!-- Dynamic prompt chips will be injected here -->
+                </div>
             </div>
-        </div>
+        </aside>
 
-        <div id="suggestions-container" class="suggestions-container hidden">
-            <!-- Dynamic prompt chips will be injected here -->
-        </div>
+        <!-- Right Side: Chat UI -->
+        <div class="app-container">
+            <header>
+                <h1>Contextual Retrieval AI</h1>
+                <p class="subtitle">Contextual Retrieval Augmented Generation</p>
+                
+                <div class="project-info">
+                    <strong>Project:</strong> Comparing Contextual Retrieval vs Naive RAG.<br>
+                    <strong>Topic:</strong> Transformers and Pretrained Language Models.<br>
+                    <strong>Dataset:</strong> Text extracted directly from Jurafsky & Martin NLP textbook and generated Question-Answer pairs.<br>
+                    <strong>Instructions:</strong> Retrieve context by asking any question below or dragging a suggested prompt!
+                </div>
+            </header>
 
-        <div class="input-area">
-            <textarea id="user-input" placeholder="Ask a question..." rows="1"></textarea>
-            <button id="send-btn">Send</button>
+            <div class="chat-window" id="chat-window">
+                <div class="message system-msg">
+                    <div class="msg-content">Hello. I am the AI assistant. Select a chapter from the sidebar, and I will stream the answer directly using the Contextual RAG Vectorstore!</div>
+                </div>
+            </div>
+
+            <div class="input-area">
+                <textarea id="user-input" placeholder="Ask a question..." rows="1"></textarea>
+                <button id="send-btn">Send</button>
+            </div>
         </div>
     </div>
 

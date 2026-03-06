@@ -1,7 +1,8 @@
 import os
 import json
 import random
-from fastapi import FastAPI, HTTPException, Request, Header
+import glob
+from fastapi import FastAPI, HTTPException, Request, Header, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import StreamingResponse
@@ -24,38 +25,76 @@ app.add_middleware(
 # Request Models
 class ChatRequest(BaseModel):
     question: str
+    chapter: str = "10" # Default to 10 if not provided
 
-# Paths (Resolving from app/backend up to the root folder)
+# Paths
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-VECTORSTORE_DIR = os.path.join(BASE_DIR, "answer", "contextual_faiss_index")
-DATASET_PATH = os.path.join(BASE_DIR, "answer", "response-st-126010-chapter-10.json")
+ANSWER_DIR = os.path.join(BASE_DIR, "answer")
 
-
-# Global state for embeddings/retriever
+# Global state for embeddings/retriever to cache per-chapter
 _embeddings = None
-_vectorstore = None
+_vectorstores = {}
 
-def get_retriever():
-    global _embeddings, _vectorstore
+def get_retriever(chapter: str):
+    global _embeddings, _vectorstores
     
-    if not os.path.exists(VECTORSTORE_DIR):
+    chapter_dir = os.path.join(ANSWER_DIR, f"chapter_{chapter}")
+    vectorstore_dir = os.path.join(chapter_dir, "contextual_faiss_index")
+    
+    if not os.path.exists(vectorstore_dir):
         raise HTTPException(
             status_code=500, 
-            detail="Contextual Vectorstore not found! Please run the 02_naive_vs_contextual_rag.ipynb notebook first to build the index."
+            detail=f"Contextual Vectorstore not found for chapter {chapter}! Please generate the index and place it in 'answer/chapter_{chapter}/contextual_faiss_index'."
         )
 
     if _embeddings is None:
         _embeddings = HuggingFaceEmbeddings(model_name="BAAI/bge-small-en-v1.5")
     
-    if _vectorstore is None:
-        _vectorstore = FAISS.load_local(VECTORSTORE_DIR, _embeddings, allow_dangerous_deserialization=True)
+    # Cache vectorstores in memory so we don't reload FAISS on every request
+    if chapter not in _vectorstores:
+        _vectorstores[chapter] = FAISS.load_local(vectorstore_dir, _embeddings, allow_dangerous_deserialization=True)
         
-    return _vectorstore.as_retriever(search_kwargs={"k": 3})
+    return _vectorstores[chapter].as_retriever(search_kwargs={"k": 3})
+
+@app.get("/api/chapters")
+async def get_chapters():
+    """Scan the answer/ directory for any valid chapter_X folders."""
+    if not os.path.exists(ANSWER_DIR):
+        return {"chapters": []}
+    
+    chapters = []
+    for item in os.listdir(ANSWER_DIR):
+        if item.startswith("chapter_") and os.path.isdir(os.path.join(ANSWER_DIR, item)):
+            chapter_num = item.replace("chapter_", "")
+            chapters.append(chapter_num)
+            
+    # Sort numerically
+    try:
+        chapters.sort(key=int)
+    except:
+        chapters.sort()
+        
+    return {"chapters": chapters}
+
 
 @app.get("/api/suggestions")
-async def get_suggestions():
+async def get_suggestions(chapter: str = Query("10")):
     try:
-        with open(DATASET_PATH, "r") as f:
+        chapter_dir = os.path.join(ANSWER_DIR, f"chapter_{chapter}")
+        
+        # Find any JSON file in the chapter directory to extract QA pairs
+        json_files = glob.glob(os.path.join(chapter_dir, "*.json"))
+        
+        if not json_files:
+            return {"suggestions": [
+                f"What is discussed in chapter {chapter}?",
+                "Can you summarize the main points?",
+                "What are the key concepts?"
+            ]}
+            
+        dataset_path = json_files[0]
+            
+        with open(dataset_path, "r") as f:
             data = json.load(f)
             
         # Extract all questions
@@ -69,12 +108,10 @@ async def get_suggestions():
             
         return {"suggestions": suggestions}
     except Exception as e:
-        print(f"Error loading suggestions: {e}")
-        # Fallback prompts if file is missing
+        print(f"Error loading suggestions for chapter {chapter}: {e}")
         return {"suggestions": [
-            "What is a Transformer?",
-            "How does attention work?",
-            "What are pretrained language models?"
+            f"What is discussed in chapter {chapter}?",
+            "Can you summarize the main points?"
         ]}
 
 @app.post("/api/chat")
@@ -83,7 +120,7 @@ async def chat_endpoint(req: ChatRequest, x_api_key: Optional[str] = Header(None
         raise HTTPException(status_code=401, detail="API Key is missing.")
     
     try:
-        retriever = get_retriever()
+        retriever = get_retriever(req.chapter)
     except HTTPException as e:
         raise e
     except Exception as e:

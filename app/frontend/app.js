@@ -8,16 +8,23 @@ const chatWindow = document.getElementById('chat-window');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
 const suggestionsContainer = document.getElementById('suggestions-container');
+const chapterSelect = document.getElementById('chapter-select');
 
 let apiKey = localStorage.getItem('gemini_api_key');
 
-// Check API Key on load
-if (!apiKey) {
-    apiModal.classList.remove('hidden');
-} else {
-    apiModal.classList.add('hidden');
-    loadSuggestions(); // Fetch suggestions if key already exists
+// Initialize App
+async function initApp() {
+    await loadChapters();
+    
+    if (!apiKey) {
+        apiModal.classList.remove('hidden');
+    } else {
+        apiModal.classList.add('hidden');
+        loadSuggestions(); // Fetch suggestions for default chapter if key already exists
+    }
 }
+
+initApp();
 
 saveKeyBtn.addEventListener('click', () => {
     const key = apiKeyInput.value.trim();
@@ -33,10 +40,50 @@ closeSourceBtn.addEventListener('click', () => {
     sourceModal.classList.add('hidden');
 });
 
-// Fetch dynamic suggestions from backend
+// Fetch discovered chapters from backend
+async function loadChapters() {
+    try {
+        const response = await fetch('/api/chapters');
+        if (response.ok) {
+            const data = await response.json();
+            chapterSelect.innerHTML = '';
+            
+            if (data.chapters.length === 0) {
+                const opt = document.createElement('option');
+                opt.value = "10";
+                opt.textContent = "Chapter 10 (Default)";
+                chapterSelect.appendChild(opt);
+            } else {
+                data.chapters.forEach(ch => {
+                    const opt = document.createElement('option');
+                    opt.value = ch;
+                    opt.textContent = `Chapter ${ch}`;
+                    chapterSelect.appendChild(opt);
+                });
+            }
+        }
+    } catch (err) {
+        console.error("Failed to load chapters:", err);
+    }
+}
+
+// Handle Chapter Selection Changes
+chapterSelect.addEventListener('change', () => {
+    if (apiKey) {
+        // Clear chat to prevent confused contexts
+        chatWindow.innerHTML = `
+            <div class="message system-msg">
+                <div class="msg-content">Switched to Chapter ${chapterSelect.value}. Ask me a question from this chapter!</div>
+            </div>`;
+        loadSuggestions();
+    }
+});
+
+// Fetch dynamic suggestions from backend for specific chapter
 async function loadSuggestions() {
     try {
-        const response = await fetch('/api/suggestions');
+        const currentChapter = chapterSelect.value || "10";
+        const response = await fetch(`/api/suggestions?chapter=${currentChapter}`);
         if (response.ok) {
             const data = await response.json();
             renderSuggestions(data.suggestions);
@@ -126,14 +173,15 @@ function formatTextToHtml(text) {
 
 async function sendMessage() {
     const text = userInput.value.trim();
+    const currentChapter = chapterSelect.value || "10";
+    
     if (!text || !apiKey) return;
 
     // Reset input
     userInput.value = '';
     userInput.style.height = 'auto';
 
-    // Hide suggestions once a conversation starts
-    suggestionsContainer.classList.add('hidden');
+    // (Intentionally leaving suggestions visible in the sidebar to fulfill feature request)
 
     // Add user message to UI
     appendFullMessage(text, 'user');
@@ -144,7 +192,6 @@ async function sendMessage() {
     msgDiv.className = 'message system-msg';
     msgDiv.id = msgDivId;
     
-    // Set up the inner container where stream text will go
     const contentDiv = document.createElement('div');
     contentDiv.className = 'msg-content blinking-cursor'; 
     msgDiv.appendChild(contentDiv);
@@ -159,7 +206,7 @@ async function sendMessage() {
                 'Content-Type': 'application/json',
                 'x-api-key': apiKey
             },
-            body: JSON.stringify({ question: text })
+            body: JSON.stringify({ question: text, chapter: currentChapter })
         });
 
         if (response.status === 401) {
@@ -181,24 +228,17 @@ async function sendMessage() {
         // Setup the stream reader
         const reader = response.body.getReader();
         const decoder = new TextDecoder("utf-8");
-        
         let accumulatedMessage = "";
         let finalSourceChunk = "";
-        
         let done = false;
         
-        // This regex extracts valid JSON payloads prefixed with 'data: '
         const sseRegex = /data:\s*({.*})\s*/;
 
         while (!done) {
             const { value, done: readerDone } = await reader.read();
             done = readerDone;
             if (value) {
-                // Decode binary chunk to string
                 const chunkStr = decoder.decode(value, { stream: !done });
-                
-                // An SSE chunk from the server might contain multiple lines or exact JSON snippets.
-                // We split by standard SSE message boundaries (double newlines)
                 const messages = chunkStr.split('\n\n');
                 
                 for (let msg of messages) {
@@ -209,16 +249,11 @@ async function sendMessage() {
                     if (match && match[1]) {
                         try {
                             const dataObj = JSON.parse(match[1]);
-                            
-                            // 1. Text chunks generated by the LLM
                             if (dataObj.text !== undefined) {
                                 accumulatedMessage += dataObj.text;
-                                // Continuously render formatted HTML back to the DOM
                                 contentDiv.innerHTML = formatTextToHtml(accumulatedMessage);
                                 chatWindow.scrollTop = chatWindow.scrollHeight;
                             }
-                            
-                            // 2. The source chunk emitted exactly once at the end of the stream
                             if (dataObj.source_chunk !== undefined) {
                                 finalSourceChunk = dataObj.source_chunk;
                             }
@@ -230,15 +265,12 @@ async function sendMessage() {
             }
         }
         
-        // Final cleanup after successful stream
         contentDiv.classList.remove('blinking-cursor');
         
-        // Append the "View Source" button if context was provided
         if (finalSourceChunk) {
             const btn = document.createElement('button');
             btn.className = 'source-btn';
             btn.textContent = 'View Source';
-            // Use arrow wrapper so it executes with the proper context at click
             btn.onclick = () => showSource(encodeURIComponent(finalSourceChunk));
             msgDiv.appendChild(btn);
             chatWindow.scrollTop = chatWindow.scrollHeight;
@@ -250,17 +282,13 @@ async function sendMessage() {
     }
 }
 
-// Helper to render one-off non-streaming messages (like User input or flat errors)
 function appendFullMessage(text, sender, sourceChunk = null) {
     const msgDiv = document.createElement('div');
     msgDiv.className = `message ${sender}-msg`;
-    
     let innerHtml = `<div class="msg-content">${formatTextToHtml(text)}</div>`;
-    
     if (sourceChunk) {
         innerHtml += `<button class="source-btn" onclick="showSource('${encodeURIComponent(sourceChunk)}')">View Source</button>`;
     }
-
     msgDiv.innerHTML = innerHtml;
     chatWindow.appendChild(msgDiv);
     chatWindow.scrollTop = chatWindow.scrollHeight;
