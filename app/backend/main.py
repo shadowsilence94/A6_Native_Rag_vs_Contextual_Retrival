@@ -24,9 +24,11 @@ app.add_middleware(
 class ChatRequest(BaseModel):
     question: str
 
-# Paths
-VECTORSTORE_DIR = "../answer/contextual_faiss_index"
-DATASET_PATH = "../answer/response-st-126010-chapter-10.json"
+# Paths (Resolving from app/backend up to the root folder)
+import os
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+VECTORSTORE_DIR = os.path.join(BASE_DIR, "answer", "contextual_faiss_index")
+DATASET_PATH = os.path.join(BASE_DIR, "answer", "response-st-126010-chapter-10.json")
 
 # Global state for embeddings/retriever
 _embeddings = None
