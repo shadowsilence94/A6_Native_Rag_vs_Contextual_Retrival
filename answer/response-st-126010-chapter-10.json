@@ -1,0 +1,122 @@
+[
+  {
+    "question": "Who are the authors mentioned in the text?",
+    "ground_truth_answer": "Daniel Jurafsky & James H. Martin.",
+    "naive_rag_answer": "The authors mentioned in the text are K. Lee, L. Zettlemoyer, L. A. Ramshaw, M. P. Marcus, M. Schuster, K. Nakajima, W. L. Taylor, W. Timkey, M. van Schijndel, A. Williams, N. Nangia, S. Bowman, Daniel Jurafsky, and James H. Martin.",
+    "contextual_retrieval_answer": "The authors mentioned in the text are Jurafsky, Martin, K. Lee, L. Zettlemoyer, L. A. Ramshaw, M. P. Marcus, M. Schuster, K. Nakajima, W. L. Taylor, W. Timkey, M. van Schijndel, A. Williams, N. Nangia, and S. Bowman."
+  },
+  {
+    "question": "What models are underpinned by the bidirectional transformer encoder?",
+    "ground_truth_answer": "The bidirectional transformer encoder underlies models like BERT and its descendants like RoBERTa or SpanBERT.",
+    "naive_rag_answer": "Models like BERT and its descendants like RoBERTa or SpanBERT are underpinned by the bidirectional transformer encoder.",
+    "contextual_retrieval_answer": "The BERT model is underpinned by the bidirectional transformer encoder. Masked language models, in general, are also examples of models underpinned by the bidirectional transformer encoder."
+  },
+  {
+    "question": "How do bidirectional encoders overcome the limitation of ignoring information to the right of the token under consideration?",
+    "ground_truth_answer": "Bidirectional encoders overcome this limitation by allowing the attention mechanism to range over the entire input.",
+    "naive_rag_answer": "Bidirectional encoders overcome the limitation of ignoring potentially useful information located to the right of the token under consideration by allowing the attention mechanism to range over the entire input.",
+    "contextual_retrieval_answer": "Bidirectional encoders overcome the limitation of ignoring information to the right of the token under consideration by allowing the attention mechanism to range over the entire input."
+  },
+  {
+    "question": "Approximately how many parameters does the resulting model have?",
+    "ground_truth_answer": "About 100M.",
+    "naive_rag_answer": "The resulting model has about 550M parameters.",
+    "contextual_retrieval_answer": "I don't know."
+  },
+  {
+    "question": "When a token is chosen for manipulation in Masked Language Modeling (MLM) training, what happens to it 80% of the time?",
+    "ground_truth_answer": "80% of the time, the token is replaced with the special vocabulary token named [MASK].",
+    "naive_rag_answer": "When a token is chosen for manipulation in Masked Language Modeling (MLM) training, 80% of the time it is replaced with the special vocabulary token named [MASK].",
+    "contextual_retrieval_answer": "When a token is chosen for manipulation in Masked Language Modeling (MLM) training, 80% of the time the token is replaced with the special vocabulary token named [MASK]."
+  },
+  {
+    "question": "How does the language modeling head produce a probability distribution over the vocabulary for each masked token?",
+    "ground_truth_answer": "The language modeling head takes the output vector hL i from the final transformer layer L for each masked token i, multiplies it by the unembedding layer ET to produce the logits u, and then uses softmax to turn the logits into probabilities y over the vocabulary.",
+    "naive_rag_answer": "To produce a probability distribution over the vocabulary for each masked token, the language modeling head takes the output vector hL i from the final transformer layer L for each masked token i. It then multiplies this vector by the unembedding layer ET to produce the logits u (ui = hL i ET). Finally, it uses softmax to turn these logits into probabilities y over the vocabulary (yi = softmax(ui)).",
+    "contextual_retrieval_answer": "To produce a probability distribution over the vocabulary for each masked token, the language modeling head takes the output vector hL i from the final transformer layer L for each masked token i, multiplies it by the unembedding layer ET to produce the logits u, and then uses softmax to turn the logits into probabilities y over the vocabulary."
+  },
+  {
+    "question": "Where are the special tokens [CLS] and [SEP] placed in BERT's input representation?",
+    "ground_truth_answer": "The token [CLS] is prepended to the input sentence pair, and the token [SEP] is placed between the sentences and after the final token of the second sentence.",
+    "naive_rag_answer": "The token [CLS] is prepended to the input sentence pair. The token [SEP] is placed between the sentences and after the final token of the second sentence.",
+    "contextual_retrieval_answer": "The token [CLS] is prepended to the input sentence pair, and the token [SEP] is placed between the sentences and after the final token of the second sentence."
+  },
+  {
+    "question": "How many tokens and in how many languages was the XLM-R model trained?",
+    "ground_truth_answer": "The XLM-R model was trained on about 300 billion tokens in 100 languages.",
+    "naive_rag_answer": "The XLM-R model was trained on about 300 billion tokens in 100 languages.",
+    "contextual_retrieval_answer": "The XLM-R model was trained on about 300 billion tokens in 100 languages."
+  },
+  {
+    "question": "According to Conneau et al. (2020), what is the benefit of setting the alpha (\u03b1) value to 0.3?",
+    "ground_truth_answer": "Conneau et al. (2020) show that \u03b1 = 0.3 works well to give rare languages more inclusion in the tokenization, resulting in better multilingual performance overall.",
+    "naive_rag_answer": "According to Conneau et al. (2020), setting \u03b1 = 0.3 works well to give rare languages more inclusion in the tokenization, resulting in better multilingual performance overall.",
+    "contextual_retrieval_answer": "According to Conneau et al. (2020), setting the alpha (\u03b1) value to 0.3 works well to give rare languages more inclusion in the tokenization, resulting in better multilingual performance overall."
+  },
+  {
+    "question": "How many times does the string 'CLS' appear in the text chunk?",
+    "ground_truth_answer": "1",
+    "naive_rag_answer": "The string 'CLS' appears 3 times in the text chunk.",
+    "contextual_retrieval_answer": "The string 'CLS' appears 1 time in the text chunk."
+  },
+  {
+    "question": "What different senses and meanings of 'die' are visible in the BERT embedding space?",
+    "ground_truth_answer": "At least two different English senses of 'die' (the singular of dice and the verb to die), as well as the German article 'die', are visible in the BERT embedding space.",
+    "naive_rag_answer": "The different senses and meanings of 'die' visible in the BERT embedding space are:\n*   The singular of dice (English sense)\n*   The verb to die (English sense)\n*   The German article (German meaning)",
+    "contextual_retrieval_answer": "In the BERT embedding space, at least two different English senses of 'die' are visible: the singular of dice and the verb to die. Additionally, the German article 'die' is also visible."
+  },
+  {
+    "question": "According to the text, how is a contextual sense embedding (vs) produced for a sense s?",
+    "ground_truth_answer": "For each sense s of any word in the corpus, for each of the n tokens of that sense, their n contextual representations (vi) are averaged to produce a contextual sense embedding vs. This is represented by the formula vs = (1/n) * sum(vi) for all vi belonging to tokens(s).",
+    "naive_rag_answer": "For each sense s of any word in the corpus, for each of the n tokens of that sense, their n contextual representations (vi) are averaged to produce a contextual sense embedding (vs).",
+    "contextual_retrieval_answer": "A contextual sense embedding (vs) for a sense s is produced by averaging the 'n' contextual representations (vi) of the 'n' tokens of that sense. This is represented by the formula: vs = (1/n) * sum(vi) for all vi in tokens(s)."
+  },
+  {
+    "question": "According to Timkey and van Schijndel (2021), how can embeddings be made more isotropic?",
+    "ground_truth_answer": "Timkey and van Schijndel (2021) show that embeddings can be made more isotropic by standardizing (z-scoring) the vectors, which involves subtracting the mean and dividing by the variance.",
+    "naive_rag_answer": "According to Timkey and van Schijndel (2021), embeddings can be made more isotropic by standardizing (z-scoring) the vectors, which involves subtracting the mean and dividing by the variance.",
+    "contextual_retrieval_answer": "According to Timkey and van Schijndel (2021), embeddings can be made more isotropic by standardizing (z-scoring) the vectors, which involves subtracting the mean and dividing by the variance."
+  },
+  {
+    "question": "What is the task of sequence classification?",
+    "ground_truth_answer": "The task of sequence classification is to classify an entire sequence of text with a single label.",
+    "naive_rag_answer": "The task of sequence classification is to classify an entire sequence of text with a single label.",
+    "contextual_retrieval_answer": "The task of sequence classification is to classify an entire sequence of text with a single label."
+  },
+  {
+    "question": "What are some practical applications that fall into the class of sequence-pair classification?",
+    "ground_truth_answer": "Practical applications that fall into this class include paraphrase detection (are the two sentences paraphrases of each other?), logical entailment (does sentence A logically entail sentence B?), and discourse coherence (how coherent is sentence B as a follow-on to sentence A?).",
+    "naive_rag_answer": "Practical applications that fall into the class of sequence-pair classification include paraphrase detection, logical entailment, and discourse coherence.",
+    "contextual_retrieval_answer": "Practical applications that fall into the class of sequence-pair classification include paraphrase detection, logical entailment, and discourse coherence."
+  },
+  {
+    "question": "What does 'tails' mean in the context described?",
+    "ground_truth_answer": "'tails' means that the premise entails the hypothesis.",
+    "naive_rag_answer": "'tails' means that the premise entails the hypothesis.",
+    "contextual_retrieval_answer": "'tails' means that the premise entails the hypothesis."
+  },
+  {
+    "question": "What is one difficulty of the NER task related to the meaning of words?",
+    "ground_truth_answer": "One difficulty is caused by type ambiguity, where a mention like \"Washington\" can refer to a person, a sports team, a city, or the US government.",
+    "naive_rag_answer": "One difficulty of the NER task related to the meaning of words is type ambiguity, where a mention like \"Washington\" can refer to a person, a sports team, a city, or the US government.",
+    "contextual_retrieval_answer": "One difficulty of the NER task is type ambiguity, where a mention like \"Washington\" can refer to different types of entities such as a person, a sports team, a city, or the US government."
+  },
+  {
+    "question": "According to the text, how is the final output tag sequence generated using a greedy approach?",
+    "ground_truth_answer": "The final output tag sequence is generated by taking the argmax tag for each token as a likely answer.",
+    "naive_rag_answer": "A greedy approach generates the final output tag sequence by taking the argmax tag for each token as a likely answer. This involves calculating `yi = softmax(hL i WK)` and then determining `ti = argmaxk(yi)`.",
+    "contextual_retrieval_answer": "According to the text, the final output tag sequence is generated using a greedy approach where the argmax tag for each token is taken as a likely answer. This is represented by the formula ti = argmaxk(yi)."
+  },
+  {
+    "question": "What characteristic of named entity tagging, not present in tasks like text categorization or part-of-speech tagging, causes problems with evaluation?",
+    "ground_truth_answer": "The fact that named entity tagging has a segmentation component which is not present in tasks like text categorization or part-of-speech tagging.",
+    "naive_rag_answer": "The fact that named entity tagging has a segmentation component which is not present in tasks like text categorization or part-of-speech tagging causes some problems with evaluation.",
+    "contextual_retrieval_answer": "Named entity tagging has a segmentation component which is not present in tasks like text categorization or part-of-speech tagging, and this causes some problems with evaluation."
+  },
+  {
+    "question": "Who authored the paper titled 'BERT: Pre-training of deep bidirectional transformers for language understanding'?",
+    "ground_truth_answer": "J. Devlin, M.-W. Chang, K. Lee, and K. Toutanova.",
+    "naive_rag_answer": "J. Devlin, M.-W. Chang, K. Lee, and K. Toutanova.",
+    "contextual_retrieval_answer": "I don't know."
+  }
+]
