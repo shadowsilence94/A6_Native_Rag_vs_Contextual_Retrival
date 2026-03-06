@@ -14,7 +14,7 @@
         <div class="modal">
             <h2>Welcome to Chapter 10 AI</h2>
             <p>Please enter your Gemini API Key to proceed. This key is used temporarily for this session.</p>
-            <input type="password" id="api-key-input" placeholder="Your API Key (gemini-3.0-flash)" autocomplete="off">
+            <input type="password" id="api-key-input" placeholder="Your API Key (gemini-2.5-flash)" autocomplete="off">
             <button id="save-key-btn">Start Session</button>
         </div>
     </div>
@@ -24,11 +24,18 @@
         <header>
             <h1>Chapter 10 Assistant</h1>
             <p class="subtitle">Contextual Retrieval Augmented Generation</p>
+            
+            <div class="project-info">
+                <strong>Project:</strong> Comparing Contextual Retrieval vs Naive RAG.<br>
+                <strong>Topic:</strong> Chapter 10: Transformers and Pretrained Language Models.<br>
+                <strong>Dataset:</strong> Text extracted directly from Jurafsky & Martin NLP textbook and 20 generated Question-Answer pairs.<br>
+                <strong>Instructions:</strong> Retrieve context by asking any question below or dragging a suggested prompt!
+            </div>
         </header>
 
         <div class="chat-window" id="chat-window">
             <div class="message system-msg">
-                <div class="msg-content">Hello. I am the AI assistant for Chapter 10 (Transformers and Pretrained Language Models). Ask me any question related to the chapter.</div>
+                <div class="msg-content">Hello. I am the AI assistant for Chapter 10. Ask me any question related to Transformers or Language Models. I will stream the answer directly using the Contextual RAG Vectorstore!</div>
             </div>
         </div>
 
@@ -50,6 +57,10 @@
             <button id="close-source-btn">Close</button>
         </div>
     </div>
+
+    <footer>
+        Htut Ko Ko (st126010) - A6 Native RAG vs Contextual Retrieval
+    </footer>
 
     <script src="app.js"></script>
 </body>
